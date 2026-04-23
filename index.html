@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Teaching Critical Thinking with AI in Clinical Courses</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; }
+html { font-size: 62.5%; height:100%; max-width:100vw; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+body { margin:0; height:100%; background:#ffffff; font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; font-size:1.8rem; line-height:1.8; color:#111; overflow:hidden; position:relative; }
+.background-dots { position:fixed; top:0; right:0; width:60%; opacity:0.15; pointer-events:none; z-index:0; }
+.rise-shell { height:100%; display:flex; flex-direction:column; position:relative; z-index:1; }
+.rise-shell__header { padding:1.8rem 3rem; background:#fff; border-bottom:1px solid #ececec; display:flex; align-items:center; justify-content:space-between; gap:2rem; }
+.rise-shell__title { font-size:2.2rem; font-weight:700; line-height:1.2; }
+.rise-shell__meta { font-size:1.5rem; color:#555; white-space:nowrap; }
+.rise-shell__body { flex:1; overflow-y:auto; padding:5rem 0; }
+.rise-page { width:100%; max-width:104rem; margin:0 auto; padding:0 3.2rem; }
+:root { --space-xs:1.4rem; --space-sm:2.2rem; --space-md:3.4rem; --space-lg:5rem; --space-xl:7rem; --blue:#007CFF; --green:#0b6b3a; --ink:#111; --muted:#60656f; --soft:#f5f8fb; --line:#dde4ee; }
+.rise-block { margin-block:var(--space-xl); padding:var(--space-lg); background:#fff; border-radius:.8rem; }
+.rise-block.alt { background:#f7f9fb; box-shadow:0 .4rem 1.6rem rgba(0,0,0,.04); }
+.rise-block.tint { background:#f4f9ff; box-shadow:0 .4rem 1.6rem rgba(0,0,0,.04); }
+.rise-block h1 { font-size:4rem; line-height:1.12; margin:0 0 var(--space-sm); }
+.rise-block h2 { font-size:2.8rem; margin:0 0 var(--space-sm); line-height:1.25; }
+.rise-block h3 { font-size:2rem; margin:0 0 1rem; line-height:1.35; }
+.rise-block h4 { font-size:1.8rem; margin:0 0 .6rem; line-height:1.35; }
+.rise-block p { margin:0 0 var(--space-sm); }
+.rise-block ul { margin:0 0 var(--space-sm); padding-left:2.4rem; }
+.rise-block li { margin:.6rem 0; }
+.cover-screen { position:fixed; inset:0; background:#fff; z-index:5000; display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center; padding:2rem; transition:opacity .35s ease, visibility .35s ease; }
+.cover-screen.hidden { opacity:0; visibility:hidden; }
+.cover-title { font-size:3.6rem; line-height:1.15; font-weight:750; margin-bottom:3rem; max-width:78rem; }
+.cover-btn { padding:1.2rem 2.4rem; font-size:1.8rem; border-radius:.6rem; border:0; background:var(--blue); color:#fff; cursor:pointer; font-weight:700; transition:background .2s ease; }
+.cover-btn:hover { background:#0066d1; }
+.hero { border-top:.8rem solid var(--blue); background:linear-gradient(180deg,#fff,#f7fbff); }
+.callout { border-left:.6rem solid var(--blue); padding:1.8rem 2.2rem; background:#f4f9ff; border-radius:.4rem; margin:var(--space-sm) 0; font-weight:650; }
+.callout2 { text-align:center; font-size:2.3rem; line-height:1.6; color:#1a1a1a; max-width:76rem; margin:3.6rem auto; padding:2rem 1rem; position:relative; }
+.callout2::before { content:""; width:6rem; height:.3rem; background:var(--green); border-radius:1rem; display:block; margin:0 auto 2rem; }
+.circle-list { padding-left:0 !important; list-style:none; margin-top:2rem; display:grid; gap:1.2rem; }
+.circle-list li { display:flex; align-items:center; margin:0; }
+.circle-num { width:3.2rem; height:3.2rem; border-radius:50%; background:var(--blue); display:flex; align-items:center; justify-content:center; color:#fff; font-weight:700; margin-right:1rem; flex:0 0 auto; }
+.split { display:grid; grid-template-columns:minmax(0,1fr) minmax(28rem,.8fr); gap:3rem; align-items:start; }
+.panel { border:1px solid var(--line); border-radius:.8rem; padding:2.2rem; background:#fff; }
+.panel.green { border-left:.5rem solid var(--green); }
+.grid-3, .grid-4, .grid-2 { display:grid; gap:1.8rem; margin-top:2rem; }
+.grid-2 { grid-template-columns:repeat(2,minmax(0,1fr)); }
+.grid-3 { grid-template-columns:repeat(3,minmax(0,1fr)); }
+.grid-4 { grid-template-columns:repeat(4,minmax(0,1fr)); }
+.mini-card { border:1px solid var(--line); border-radius:.8rem; padding:2rem; background:#fff; min-height:100%; }
+.mini-card h3, .mini-card h4 { color:#0d3155; }
+.reveal-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(23rem,1fr)); gap:1.6rem; margin-top:2rem; }
+.reveal-card { border:1px solid var(--line); border-radius:.8rem; background:#fff; overflow:hidden; }
+.reveal-btn { width:100%; border:0; background:#eef6ff; color:#10243a; padding:1.6rem; font-size:1.8rem; font-weight:700; text-align:left; cursor:pointer; }
+.reveal-content { display:none; padding:1.8rem; }
+.reveal-card.open .reveal-content { display:block; }
+.accordion { border:1px solid #d9e1ea; border-radius:.8rem; overflow:hidden; background:#fff; }
+.accordion-item + .accordion-item { border-top:1px solid #d9e1ea; }
+.accordion-header { background:#f7f9fb; padding:1.6rem 1.8rem; cursor:pointer; font-size:1.8rem; font-weight:700; }
+.accordion-content { display:none; padding:1.8rem; background:#fff; }
+.accordion-item.open .accordion-content { display:block; }
+.rise-tabs { display:flex; flex-wrap:wrap; gap:1rem; margin-top:1.6rem; }
+.tab-btn { padding:.9rem 1.5rem; border-radius:.7rem; border:1px solid #cbd7e5; background:#fff; cursor:pointer; font-size:1.6rem; font-weight:650; }
+.tab-btn.active { background:#eaf4ff; border-color:#7dbaff; color:#07315b; }
+.tab-content { display:none; margin-top:1.8rem; }
+.tab-content.active { display:block; }
+.card-sequence { position:relative; margin:3rem auto; width:100%; max-width:82rem; }
+.card-sequence::before { content:""; position:absolute; left:2rem; top:0; width:2px; height:100%; background:#d9e1ea; z-index:0; }
+.sequence-card { position:relative; background:#fff; border-radius:.8rem; padding:2.2rem 2.6rem; margin:2.4rem 0 2.4rem 4rem; box-shadow:0 4px 18px rgba(0,0,0,.07); border-left:.4rem solid var(--green); z-index:2; }
+.sequence-date { color:var(--green); font-weight:800; font-size:1.6rem; margin-bottom:.6rem; }
+.choice-block { display:grid; grid-template-columns:28rem 1fr; gap:2rem; align-items:start; }
+.choice-menu { display:grid; gap:1rem; }
+.choice-btn { border:1px solid #cbd7e5; background:#fff; text-align:left; padding:1.4rem 1.6rem; border-radius:.7rem; font-size:1.65rem; font-weight:700; cursor:pointer; }
+.choice-btn.active { border-color:var(--blue); background:#eaf4ff; }
+.choice-panel { display:none; }
+.choice-panel.active { display:block; }
+.comparison { display:grid; grid-template-columns:1fr 1fr; gap:1.8rem; margin-top:2rem; }
+.comparison .panel:first-child { border-top:.5rem solid #7a8a9a; }
+.comparison .panel:last-child { border-top:.5rem solid var(--green); }
+.quote-line { border-block:1px solid var(--line); padding:2.4rem 0; font-weight:700; color:#1b2d40; }
+.section-divider { text-align:center; background:#fff; border-top:.6rem solid var(--green); box-shadow:0 .4rem 1.6rem rgba(0,0,0,.04); }
+.section-divider h2 { margin-bottom:0; }
+@media (max-width:850px) {
+  .rise-shell__header { align-items:flex-start; flex-direction:column; }
+  .split, .grid-2, .grid-3, .grid-4, .choice-block, .comparison { grid-template-columns:1fr; }
+  .rise-block { padding:3rem 2rem; margin-block:4rem; }
+  .rise-page { padding:0 1.8rem; }
+}
+</style>
+</head>
+<body>
+<svg class="background-dots"
+     viewBox="0 0 800 600">
+  <defs>
+    <pattern id="dots1" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse">
+      <circle cx="3" cy="3" r="3" fill="#007CFF"/>
+    </pattern>
+  </defs>
+  <rect width="800" height="600" fill="url(#dots1)" />
+</svg>
+<div class="cover-screen" id="cover">
+  <div class="cover-title">Teaching Critical Thinking with AI in Clinical Courses</div>
+  <button class="cover-btn" id="coverBegin">Begin</button>
+</div>
+
+<div class="rise-shell">
+<header class="rise-shell__header">
+  <div class="rise-shell__title">Teaching Critical Thinking with AI in Clinical Courses</div>
+  <div class="rise-shell__meta">Clinical Courses</div>
+</header>
+<main class="rise-shell__body">
+<div class="rise-page">
+
+<section class="rise-block hero">
+  <h1>Teaching Critical Thinking with AI in Clinical Courses</h1>
+  <div class="callout">Strong clinical performance depends on how decisions are made, not how answers are obtained.</div>
+</section>
+
+<section class="rise-block alt">
+  <h2>Lesson Outline</h2>
+  <ul class="circle-list">
+    <li><div class="circle-num">1</div><span>Session Overview</span></li>
+    <li><div class="circle-num">2</div><span>What Critical Thinking Looks Like in Clinical Work</span></li>
+    <li><div class="circle-num">3</div><span>How AI Can Shape Student Thinking</span></li>
+    <li><div class="circle-num">4</div><span>Fixed Action Menu</span></li>
+    <li><div class="circle-num">5</div><span>Attach Consequences to Each Option</span></li>
+    <li><div class="circle-num">6</div><span>Force Tradeoffs</span></li>
+    <li><div class="circle-num">7</div><span>Sequential Decisions</span></li>
+    <li><div class="circle-num">8</div><span>What This Means for Faculty Practice</span></li>
+  </ul>
+</section>
+
+<section class="rise-block">
+  <h2>Session Overview</h2>
+  <div class="split">
+    <div>
+      <p>This session examines how clinical instruction functions when learners can generate answers quickly using AI tools. The focus is on how these tools affect thinking during clinical tasks, not on restricting their use. Instruction remains centered on how decisions are made under real conditions.</p>
+      <p>Learners work with patient scenarios where information is incomplete and multiple interpretations are possible. They must decide what matters, compare options, and justify a course of action. The session prioritizes how reasoning is formed, not how quickly an answer is produced.</p>
+    </div>
+    <div class="panel green">
+      <h3>Learning Objectives</h3>
+      <p>By the end of this session, learners will be able to:</p>
+      <ul>
+        <li>Analyze clinical information to determine what is relevant for a decision</li>
+        <li>Compare multiple possible interpretations before selecting a course of action</li>
+        <li>Justify clinical decisions using clear and specific reasoning</li>
+      </ul>
+    </div>
+  </div>
+  <h3>What the Session Examines</h3>
+  <div class="reveal-grid">
+    <div class="reveal-card">
+      <button class="reveal-btn" type="button">Clinical Thinking</button>
+      <div class="reveal-content"><p>Learners must move from identifying facts to deciding how those facts guide action. This includes selecting what information to use and determining how it applies to the situation.</p></div>
+    </div>
+    <div class="reveal-card">
+      <button class="reveal-btn" type="button">Surface Responses</button>
+      <div class="reveal-content"><p>Some responses rely on listing information without using it. These responses often avoid choosing between options or fail to explain why one option is stronger.</p></div>
+    </div>
+    <div class="reveal-card">
+      <button class="reveal-btn" type="button">Tool Influence</button>
+      <div class="reveal-content"><p>AI tools can provide complete responses quickly. Learners must still evaluate those responses, decide whether they apply, and determine if they support a sound clinical decision.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="rise-block tint">
+  <h2>What Critical Thinking Looks Like in Clinical Work</h2>
+  <p>Clinical work requires decisions that lead to action. A learner must decide what to do using the information available in that moment. That information is often incomplete, and it may point in more than one direction. The quality of thinking is judged by how the learner handles that uncertainty.</p>
+  <p>A response that only describes findings does not show thinking. A response that selects an action and explains why it fits the situation does.</p>
+</section>
+
+<section class="rise-block">
+  <h2>Core Demands</h2>
+  <div class="rise-tabs">
+    <button class="tab-btn active" type="button" data-group="core" data-target="core-relevance">Relevance</button>
+    <button class="tab-btn" type="button" data-group="core" data-target="core-interpretation">Interpretation</button>
+    <button class="tab-btn" type="button" data-group="core" data-target="core-action">Action</button>
+  </div>
+  <div class="tab-content active" data-group="core" id="core-relevance">
+    <div class="panel"><h3>Relevance</h3><p>The learner determines which details affect the decision. This requires filtering out information that does not change the plan of care. For example, a learner may receive a full patient history but must isolate the findings that influence the immediate clinical question.</p></div>
+  </div>
+  <div class="tab-content" data-group="core" id="core-interpretation">
+    <div class="panel"><h3>Interpretation</h3><p>The learner considers more than one explanation for the same set of findings. Each interpretation must be weighed against the available data. This prevents premature closure, where a single explanation is accepted without comparison.</p></div>
+  </div>
+  <div class="tab-content" data-group="core" id="core-action">
+    <div class="panel"><h3>Action</h3><p>The learner selects a course of action based on the strongest interpretation. The decision must connect directly to the information identified as relevant. The learner must also explain why this action is more appropriate than other options.</p></div>
+  </div>
+  <div class="quote-line">These demands do not occur in sequence. A learner may adjust what counts as relevant while comparing interpretations or revise a decision as new data is considered. This requires continuous control over how information is used, not a fixed step-by-step approach.</div>
+</section>
+
+<section class="rise-block alt">
+  <div class="comparison">
+    <div class="panel">
+      <h2>What Weak Thinking Looks Like</h2>
+      <p>Some responses appear complete but avoid decision-making. These responses often:</p>
+      <ul>
+        <li>List findings without linking them to a decision</li>
+        <li>Present one interpretation without considering alternatives</li>
+        <li>Select an action without explaining why it fits the case</li>
+      </ul>
+      <p>These patterns suggest that information is recognized but not used.</p>
+    </div>
+    <div class="panel">
+      <h2>What Strong Thinking Looks Like</h2>
+      <p>Stronger responses show how information leads to a decision. This typically includes:</p>
+      <ul>
+        <li>Prioritizing findings that directly affect the clinical question</li>
+        <li>Comparing at least two plausible interpretations</li>
+        <li>Selecting one action and explaining why it is justified</li>
+      </ul>
+      <p>The explanation must connect the data, the interpretation, and the decision.</p>
+    </div>
+  </div>
+  <div class="callout">Clinical thinking is demonstrated when a learner makes a decision and supports it with clear reasoning tied to the case.</div>
+</section>
+
+<section class="rise-block">
+  <h2>How AI Can Shape Student Thinking</h2>
+  <p>Tools that generate responses can assist with early stages of a task. They can organize large amounts of information, outline standard approaches, and model how ideas connect within a clinical context. When used deliberately, they can help learners see how a response might be structured.</p>
+  <p>These tools also change how learners begin a task. Instead of forming an initial position, a learner may start by reviewing a complete response. This shifts the role of the learner from generating reasoning to evaluating or selecting from what is already produced.</p>
+</section>
+
+<section class="rise-block tint">
+  <h2>How AI Can Shape Student Thinking</h2>
+  <p>Tools that generate responses can assist with the early stages of clinical tasks. They can organize information, model common approaches, and show how different elements of a case might be connected. This can be useful when a learner is unfamiliar with a task or needs support structuring a response.</p>
+  <p>At the same time, these tools can change how a learner engages with the task itself. Instead of determining what matters in the case, the learner may begin by reviewing a completed response. This shifts the task from constructing reasoning to evaluating what has already been produced. When this becomes the default approach, fewer decisions are made by the learner during the process.</p>
+  <h3>Where the Shift Occurs</h3>
+  <div class="accordion">
+    <div class="accordion-item"><div class="accordion-header">Initial Position</div><div class="accordion-content"><p>A learner may delay forming an interpretation of the case. Instead of asking “What do I think is happening?” the learner asks “What does the tool produce?” This reduces the need to identify relevant findings before seeing an answer.</p></div></div>
+    <div class="accordion-item"><div class="accordion-header">Use of Information</div><div class="accordion-content"><p>Information may be accepted as presented rather than selected and applied. A response can include accurate details without showing how those details influenced a decision.</p></div></div>
+    <div class="accordion-item"><div class="accordion-header">Comparison of Options</div><div class="accordion-content"><p>Generated responses often present one dominant interpretation. Without deliberate effort, the learner may not consider alternative explanations or test competing options against the case.</p></div></div>
+    <div class="accordion-item"><div class="accordion-header">Decision Commitment</div><div class="accordion-content"><p>When multiple reasonable actions exist, the learner may adopt the one provided without examining why it is stronger than other possibilities.</p></div></div>
+  </div>
+  <div class="callout2">These changes do not indicate that the learner lacks knowledge. They indicate that fewer decisions are required during the task. The structure of the tool reduces the need to choose, compare, and justify.</div>
+</section>
+
+<section class="rise-block">
+  <div class="rise-tabs">
+    <button class="tab-btn active" type="button" data-group="patterns" data-target="patterns-common">Common Response Patterns</button>
+    <button class="tab-btn" type="button" data-group="patterns" data-target="patterns-stronger">Why Responses Appear Stronger Than They Are</button>
+    <button class="tab-btn" type="button" data-group="patterns" data-target="patterns-impact">Instructional Impact</button>
+    <button class="tab-btn" type="button" data-group="patterns" data-target="patterns-design">Implications for Task Design</button>
+  </div>
+  <div class="tab-content active" data-group="patterns" id="patterns-common">
+    <h2>Common Response Patterns</h2>
+    <p>Some patterns appear consistently when learners rely on generated responses without modifying their approach:</p>
+    <ul>
+      <li>The response moves directly to a conclusion without showing how the conclusion was reached</li>
+      <li>Key findings are included but not prioritized or connected to the decision</li>
+      <li>Only one interpretation is presented, even when the case supports more than one</li>
+      <li>The selected action is appropriate but not clearly justified</li>
+      <li>Language is precise, but reasoning is not visible</li>
+    </ul>
+    <p>These responses often appear complete because they are well organized. However, they do not show how the learner worked through the problem.</p>
+  </div>
+  <div class="tab-content" data-group="patterns" id="patterns-stronger">
+    <h2>Why Responses Appear Stronger Than They Are</h2>
+    <p>Generated responses often include features that signal quality:</p>
+    <ul>
+      <li>Clear structure with labeled sections</li>
+      <li>Correct terminology used in the appropriate context</li>
+      <li>Logical flow between points</li>
+    </ul>
+    <p>These features can make a response seem more developed than it is. The structure can mask missing steps in reasoning. A response may look complete while still avoiding key decisions.</p>
+  </div>
+  <div class="tab-content" data-group="patterns" id="patterns-impact">
+    <h2>Instructional Impact</h2>
+    <p>When these patterns are present, it becomes difficult to evaluate how a learner is thinking. The instructor sees a finished product but cannot determine how the learner interpreted the case or why a decision was made.</p>
+    <p>This leads to several instructional challenges:</p>
+    <ul>
+      <li>The reasoning process is not visible in the submitted work</li>
+      <li>Different learners may produce nearly identical responses</li>
+      <li>Errors in judgment are harder to detect because the structure appears correct</li>
+      <li>Feedback becomes less specific because the point of breakdown is unclear</li>
+    </ul>
+    <p>Instruction must therefore make the decision process visible. Tasks must require learners to state what they considered, what they rejected, and why they selected a particular course of action.</p>
+  </div>
+  <div class="tab-content" data-group="patterns" id="patterns-design">
+    <h2>Implications for Task Design</h2>
+    <p>If a task allows a complete response to be submitted without showing reasoning, the learner can rely on the structure provided by the tool. To counter this, tasks must require decisions that cannot be bypassed.</p>
+    <p>Effective adjustments include:</p>
+    <ul>
+      <li>Requiring learners to identify which findings influenced their decision</li>
+      <li>Asking for comparison between at least two plausible interpretations</li>
+      <li>Requiring justification for why one action was selected over others</li>
+      <li>Designing prompts where different choices lead to different outcomes</li>
+    </ul>
+    <p>These changes force the learner to engage with the case rather than accept a generated response.</p>
+  </div>
+</section>
+
+<section class="rise-block section-divider">
+  <h2>Design Implementation Ideas</h2>
+</section>
+
+<section class="rise-block alt">
+  <h2>Fixed Action Menu</h2>
+  <p>A fixed action menu limits the response to a defined set of choices. The learner cannot respond in general terms. They must select one option and proceed from that choice. This changes the task from describing what could be done to deciding what will be done.</p>
+  <p>This approach is most effective when the options are all reasonable. If one option is clearly correct, the task becomes recall. If each option has tradeoffs, the learner must examine the case closely before choosing.</p>
+  <div class="choice-block">
+    <div class="choice-menu">
+      <button class="choice-btn active" type="button" data-choice-group="fixed" data-choice-target="fixed-practice">How It Works in Practice</button>
+      <button class="choice-btn" type="button" data-choice-group="fixed" data-choice-target="fixed-changes">Why This Changes the Task</button>
+      <button class="choice-btn" type="button" data-choice-group="fixed" data-choice-target="fixed-visible">What Becomes Visible</button>
+      <button class="choice-btn" type="button" data-choice-group="fixed" data-choice-target="fixed-design">Design Considerations</button>
+    </div>
+    <div>
+      <div class="choice-panel active panel" id="fixed-practice" data-choice-group="fixed">
+        <h3>How It Works in Practice</h3>
+        <p>The instructor presents a short clinical scenario followed by a small set of actions. The learner selects one and explains why it fits the case better than the others.</p>
+        <p>A basic structure:</p>
+        <ul>
+          <li>A focused patient scenario with relevant details</li>
+          <li>Three or four possible actions</li>
+          <li>A requirement to select one option</li>
+          <li>A short explanation tied to the case</li>
+        </ul>
+        <p>The explanation must refer to specific findings. General statements are not sufficient.</p>
+      </div>
+      <div class="choice-panel panel" id="fixed-changes" data-choice-group="fixed">
+        <h3>Why This Changes the Task</h3>
+        <div class="grid-3">
+          <div class="mini-card"><h4>Forces Commitment</h4><p>The learner must choose one path. This removes the option to describe multiple approaches without deciding.</p></div>
+          <div class="mini-card"><h4>Reveals Differences</h4><p>When options are placed side by side, small differences become important. The learner must determine which differences matter for this case.</p></div>
+          <div class="mini-card"><h4>Limits Evasion</h4><p>A fixed menu prevents broad or unfocused responses. The learner cannot rely on general clinical language to avoid making a decision.</p></div>
+        </div>
+      </div>
+      <div class="choice-panel panel" id="fixed-visible" data-choice-group="fixed">
+        <h3>What Becomes Visible</h3>
+        <p>When learners work within a fixed set of actions, specific aspects of thinking can be evaluated:</p>
+        <ul>
+          <li>Whether the selected option aligns with key findings</li>
+          <li>Whether the learner understands the consequences of each choice</li>
+          <li>Whether the explanation connects the case details to the decision</li>
+        </ul>
+        <p>Errors are easier to identify because the decision point is clear.</p>
+      </div>
+      <div class="choice-panel panel" id="fixed-design" data-choice-group="fixed">
+        <h3>Design Considerations</h3>
+        <div class="accordion">
+          <div class="accordion-item"><div class="accordion-header">Option Quality</div><div class="accordion-content"><p>Each option should be plausible. Include choices that reflect common errors or incomplete reasoning, not just incorrect answers.</p></div></div>
+          <div class="accordion-item"><div class="accordion-header">Case Alignment</div><div class="accordion-content"><p>Details in the scenario should support more than one option at first glance. This requires the learner to weigh evidence rather than match patterns.</p></div></div>
+          <div class="accordion-item"><div class="accordion-header">Explanation Requirement</div><div class="accordion-content"><p>Require a brief justification. Without it, the task only shows selection, not reasoning.</p></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="rise-block">
+  <h2>Attach Consequences to Each Option</h2>
+  <p>A decision should lead to a result. If nothing follows the choice, the task ends too early. The learner selects an option but never sees what that option produces. This limits what can be learned from the task.</p>
+  <p>When consequences are built in, the learner must deal with the outcome of the decision. The result may confirm the choice, reveal a problem, or introduce a new issue that must be managed. This extends the task beyond selection into evaluation.</p>
+  <div class="card-sequence">
+    <div class="sequence-card">
+      <div class="sequence-date">What the Instructor Sets Up</div>
+      <p>The instructor prepares outcomes in advance for each option in the menu. Each outcome should reflect what would reasonably happen if that action were taken in practice.</p>
+      <p>A simple structure:</p>
+      <ul>
+        <li>A clinical scenario with a clear decision point</li>
+        <li>Three or four possible actions</li>
+        <li>A defined outcome attached to each action</li>
+        <li>A follow-up prompt that asks the learner to respond to the result</li>
+      </ul>
+      <p>The outcome should be specific. It should change the situation in a way the learner must address.</p>
+    </div>
+    <div class="sequence-card">
+      <div class="sequence-date">What the Learner Does</div>
+      <p>After selecting an option, the learner is shown the result of that choice. They must then interpret what happened and decide what to do next.</p>
+      <p>This often involves:</p>
+      <ul>
+        <li>Identifying whether the outcome improved or worsened the situation</li>
+        <li>Explaining why the outcome occurred based on the original decision</li>
+        <li>Adjusting the plan if the result introduces new risks or complications</li>
+      </ul>
+      <p>The learner is not only judged on the initial choice, but on how they respond to what follows.</p>
+    </div>
+    <div class="sequence-card">
+      <div class="sequence-date">How This Changes Evaluation</div>
+      <p>Evaluation shifts from checking whether the answer is correct to examining how the learner handles the outcome. A correct decision with weak reasoning can still be identified. An incorrect decision can still produce useful work if the learner recognizes the issue and responds appropriately.</p>
+      <p>This makes it possible to see:</p>
+      <ul>
+        <li>Whether the learner understands the link between action and result</li>
+        <li>Whether they can recognize when a decision leads to a problem</li>
+        <li>Whether they can adjust their approach based on new information</li>
+      </ul>
+    </div>
+    <div class="sequence-card">
+      <div class="sequence-date">Patterns That Emerge</div>
+      <p>When consequences are used consistently, patterns in judgment become easier to track across tasks. Some learners may repeatedly choose options that create avoidable complications. Others may recognize issues quickly but struggle to adjust their plan.</p>
+      <p>These patterns provide specific points for feedback. Instead of general comments, the instructor can refer to how the learner responded to particular outcomes and where their reasoning needs to change.</p>
+    </div>
+  </div>
+</section>
+
+<section class="rise-block tint">
+  <h2>Force Tradeoffs</h2>
+  <p>Some clinical choices are difficult because each option solves one problem while creating another. One action may reduce immediate risk but delay needed treatment. Another may move treatment forward but increase the chance of harm. When a task includes this kind of tension, the learner cannot rely on a simple best answer. They must decide which concern should carry more weight in that situation.</p>
+  <p>This changes the work of the task. The learner is not searching for the one option with no downside. They are comparing costs, limits, and likely effects. The quality of the response depends on whether the learner can explain why one drawback is more acceptable than another.</p>
+</section>
+
+<section class="rise-block">
+  <h2>What the Instructor Builds Into the Task</h2>
+  <p>To force a tradeoff, the instructor designs the options so that none of them is fully comfortable. Each option should offer a benefit, but each should also create a meaningful cost.</p>
+  <p>This can be done in several ways:</p>
+  <div class="grid-4">
+    <div class="mini-card"><p>One option supports speed but reduces certainty</p></div>
+    <div class="mini-card"><p>One option protects safety but delays action</p></div>
+    <div class="mini-card"><p>One option addresses the main problem but creates strain elsewhere</p></div>
+    <div class="mini-card"><p>One option gathers more information but uses time the patient may not have</p></div>
+  </div>
+  <p>The tradeoff must be real. If one option is clearly safer, faster, and more appropriate than all others, the learner is not prioritizing. They are simply spotting the best answer.</p>
+</section>
+
+<section class="rise-block alt">
+  <h2>What the Learner Is Actually Doing</h2>
+  <p>The learner reads the case and identifies the competing concerns built into it. Then the learner must decide which concern takes priority and why.</p>
+  <p>That means the learner is doing several concrete things:</p>
+  <div class="accordion">
+    <div class="accordion-item"><div class="accordion-header">Identifying the conflict</div><div class="accordion-content"><p>The learner names the two or three concerns that are in tension. These might involve urgency, safety, comfort, uncertainty, available resources, or likely outcomes.</p></div></div>
+    <div class="accordion-item"><div class="accordion-header">Judging the cost of each option</div><div class="accordion-content"><p>The learner looks at what each action gives and what it gives up. This requires more than describing the options. It requires judging the practical effect of each cost.</p></div></div>
+    <div class="accordion-item"><div class="accordion-header">Choosing what matters most</div><div class="accordion-content"><p>The learner decides which risk, delay, or limitation is most acceptable in that case. This is the center of the task.</p></div></div>
+    <div class="accordion-item"><div class="accordion-header">Explaining the priority</div><div class="accordion-content"><p>The learner states why one concern should come first under those conditions. The explanation must be tied to the facts of the case, not to a general rule stated in isolation.</p></div></div>
+  </div>
+</section>
+
+<section class="rise-block">
+  <h2>Why This Matters</h2>
+  <p>A tradeoff changes the kind of thinking the task requires. The learner cannot succeed by recalling a standard response and applying it automatically. They must decide how to act when important goals cannot all be achieved at once.</p>
+  <p>This matters because clinical work often requires that kind of judgment. A clinician may need to protect stability before pursuing completeness. In another case, acting quickly may matter more than gathering every detail first. The task should make the learner confront that tension directly.</p>
+  <p>It also prevents a common weakness in classroom responses. Learners often write as if every good clinical decision achieves all goals at the same time. A tradeoff removes that illusion. It makes the learner account for what is lost as well as what is gained.</p>
+</section>
+
+<section class="rise-block tint">
+  <div class="rise-tabs">
+    <button class="tab-btn active" type="button" data-group="tradeoff" data-target="tradeoff-design">What Good Task Design Looks Like</button>
+    <button class="tab-btn" type="button" data-group="tradeoff" data-target="tradeoff-visible">What Becomes Visible in Student Work</button>
+    <button class="tab-btn" type="button" data-group="tradeoff" data-target="tradeoff-example">A Simple Example of the Structure</button>
+  </div>
+  <div class="tab-content active" data-group="tradeoff" id="tradeoff-design">
+    <h2>What Good Task Design Looks Like</h2>
+    <p>A strong tradeoff task is built around a specific point of tension. The learner should be able to see that there is a decision to make, but not resolve it immediately without thought.</p>
+    <p>Useful design features include:</p>
+    <div class="grid-2">
+      <div class="mini-card"><h3>Plausible options</h3><p>Every option should be defensible at first glance. The learner should need to think before ruling one out.</p></div>
+      <div class="mini-card"><h3>Relevant costs</h3><p>The cost attached to each option should matter clinically. Minor inconveniences do not create a meaningful tradeoff.</p></div>
+      <div class="mini-card"><h3>Case details that affect priority</h3><p>The facts of the case should influence which cost is more acceptable. The learner should need to use those details to decide.</p></div>
+      <div class="mini-card"><h3>A required explanation</h3><p>The prompt should ask the learner to explain not only what was chosen, but what was accepted or sacrificed by making that choice.</p></div>
+    </div>
+  </div>
+  <div class="tab-content" data-group="tradeoff" id="tradeoff-visible">
+    <h2>What Becomes Visible in Student Work</h2>
+    <p>When tradeoffs are built into a task, the instructor can see more than whether the learner selected a defensible option. The response shows how the learner sets priorities.</p>
+    <p>This makes several things easier to observe:</p>
+    <ul>
+      <li>Whether the learner can recognize competing concerns in the case</li>
+      <li>Whether the learner understands the practical cost of each option</li>
+      <li>Whether the learner can defend one priority over another</li>
+      <li>Whether the explanation is tied to the case rather than to vague principles</li>
+    </ul>
+    <p>This kind of task also reveals a difference between weak and strong justification. A weak response often treats one option as obviously right and ignores what it costs. A stronger response acknowledges the cost, explains why it is acceptable here, and shows awareness of what is being given up.</p>
+  </div>
+  <div class="tab-content" data-group="tradeoff" id="tradeoff-example">
+    <h2>A Simple Example of the Structure</h2>
+    <p>An instructor presents a patient scenario with a decision that involves timing, risk, and incomplete information. The learner receives three possible actions.</p>
+    <ul>
+      <li>One action moves quickly but relies on limited information</li>
+      <li>One action gathers more certainty but delays intervention</li>
+      <li>One action reduces immediate risk but does not address the larger problem</li>
+    </ul>
+    <p>The learner must choose one. Then the learner explains what priority drove the decision and what cost was accepted by making it.</p>
+    <p>That explanation is where the thinking becomes visible. The instructor can see whether the learner understood the tension in the case or simply chose the option that sounded safest on paper.</p>
+  </div>
+</section>
+
+<section class="rise-block">
+  <h2>Sequential Decisions</h2>
+  <p>Many clinical tasks are presented as if one answer completes the work. A learner reads a case, chooses an action, and stops. That structure hides an important part of clinical thinking because real decisions do not end the situation. One choice changes the conditions of the case, and the next choice must be made from there.</p>
+  <p>A sequential task is built around that reality. The learner makes an initial decision, receives new information, and then must decide again. The next step is shaped by what was done earlier. This makes the task less about producing a single strong response and more about managing a developing situation.</p>
+</section>
+
+<section class="rise-block alt">
+  <h2>What the Instructor Builds</h2>
+  <p>The instructor designs the case in stages rather than all at once. The learner does not receive the full scenario upfront. Instead, the case unfolds across a short sequence.</p>
+  <p>A basic structure might look like this:</p>
+  <div class="card-sequence">
+    <div class="sequence-card"><div class="sequence-date">Step 1: Initial presentation</div><p>The learner receives the first set of findings and must decide what to do first.</p></div>
+    <div class="sequence-card"><div class="sequence-date">Step 2: New development</div><p>The instructor introduces a change. This might be a new symptom, a response to treatment, a test result, or a complication.</p></div>
+    <div class="sequence-card"><div class="sequence-date">Step 3: Follow-up choice</div><p>The learner must decide how to respond now that the situation has changed.</p></div>
+    <div class="sequence-card"><div class="sequence-date">Step 4: Brief reflection</div><p>The learner explains how the earlier decision affected the next step.</p></div>
+  </div>
+  <p>This structure makes the task cumulative. The learner cannot treat each moment as separate from the one before it.</p>
+</section>
+
+<section class="rise-block">
+  <div class="rise-tabs">
+    <button class="tab-btn active" type="button" data-group="sequential" data-target="seq-doing">What the Learner Is Actually Doing</button>
+    <button class="tab-btn" type="button" data-group="sequential" data-target="seq-matters">Why This Matters</button>
+    <button class="tab-btn" type="button" data-group="sequential" data-target="seq-strong">What Strong Performance Looks Like</button>
+    <button class="tab-btn" type="button" data-group="sequential" data-target="seq-weak">What Weak Performance Looks Like</button>
+  </div>
+  <div class="tab-content active" data-group="sequential" id="seq-doing">
+    <h2>What the Learner Is Actually Doing</h2>
+    <p>In a sequential task, the learner is not simply answering three different prompts. The learner is carrying a line of judgment forward over time.</p>
+    <p>That means the learner must:</p>
+    <ul>
+      <li>make an initial choice using limited information</li>
+      <li>notice how the case changes after that choice</li>
+      <li>decide whether the original plan still fits the situation</li>
+      <li>continue, revise, or reverse the plan based on what now matters most</li>
+    </ul>
+    <p>This is different from answering isolated questions. The learner must keep track of the logic of the case from one step to the next.</p>
+  </div>
+  <div class="tab-content" data-group="sequential" id="seq-matters">
+    <h2>Why This Matters</h2>
+    <p>A single-response task can make reasoning look stronger than it is. A learner may choose a plausible action once, but that does not show whether the learner can manage a case as it develops. Sequential decisions test whether thinking holds together over time.</p>
+    <p>This matters because later decisions often depend on how the early problem was framed. If the learner misunderstood the first step, that misunderstanding may affect everything that follows. A staged task makes that chain visible.</p>
+    <p>It also changes the kind of attention the learner must give to the case. Instead of focusing only on the immediate question, the learner must consider how the current decision may shape later options.</p>
+  </div>
+  <div class="tab-content" data-group="sequential" id="seq-strong">
+    <h2>What Strong Performance Looks Like</h2>
+    <p>Strong work in a sequential task is not just a series of correct answers. It shows that the learner understands the relation between one step and the next.</p>
+    <p>That often includes:</p>
+    <div class="grid-2">
+      <div class="mini-card"><h3>A clear starting judgment</h3><p>The first decision is tied to the facts available at the time, not to information that appears later.</p></div>
+      <div class="mini-card"><h3>Adjustment without drift</h3><p>When new information appears, the learner updates the plan for a reason. The revision is connected to the change in the case.</p></div>
+      <div class="mini-card"><h3>Continuity in reasoning</h3><p>The learner does not treat each step as unrelated. The explanation shows awareness of how earlier choices shaped the current position.</p></div>
+      <div class="mini-card"><h3>Recognition of error</h3><p>If the first decision created a problem, the learner can identify that problem and respond to it directly rather than ignoring it.</p></div>
+    </div>
+  </div>
+  <div class="tab-content" data-group="sequential" id="seq-weak">
+    <h2>What Weak Performance Looks Like</h2>
+    <p>Sequential tasks also expose weaknesses that are harder to see in one-step assignments.</p>
+    <p>Common problems include:</p>
+    <ul>
+      <li>making an initial choice and then repeating it even when the case changes</li>
+      <li>changing direction without explaining why the new information matters</li>
+      <li>treating each stage as a separate question with no connection to the earlier decision</li>
+      <li>failing to recognize that an earlier choice limited later options</li>
+    </ul>
+    <p>These responses suggest that the learner is reacting to each prompt rather than managing a continuous clinical situation.</p>
+  </div>
+</section>
+
+<section class="rise-block tint">
+  <h2>How to Design the Sequence Well</h2>
+  <p>A useful sequence should be short enough to stay focused but long enough to show development. In most cases, two or three decision points are enough.</p>
+  <p>To make the task work, the instructor should ensure that:</p>
+  <div class="reveal-grid">
+    <div class="reveal-card"><button class="reveal-btn" type="button">Each stage changes the case in a meaningful way</button><div class="reveal-content"><p>The next step should require thought, not just confirm the first answer.</p></div></div>
+    <div class="reveal-card"><button class="reveal-btn" type="button">Earlier choices matter later</button><div class="reveal-content"><p>The learner should be able to see that the first action affected what became possible or necessary afterward.</p></div></div>
+    <div class="reveal-card"><button class="reveal-btn" type="button">New information is relevant, not decorative</button><div class="reveal-content"><p>Each added detail should force the learner to reconsider, refine, or defend the plan.</p></div></div>
+    <div class="reveal-card"><button class="reveal-btn" type="button">The final prompt asks about the path, not just the ending</button><div class="reveal-content"><p>The learner should explain how the reasoning developed across the sequence.</p></div></div>
+  </div>
+</section>
+
+<section class="rise-block">
+  <div class="comparison">
+    <div class="panel">
+      <h2>Where This Helps Most</h2>
+      <p>Sequential decisions are especially useful when the goal is to examine how learners respond to change. They work well in cases where timing matters, patient status evolves, or early interpretation influences later action.</p>
+      <p>They are also useful when an instructor wants to see whether a learner can recover from a weak initial choice. In a single-response task, that opportunity never appears. In a staged task, the learner has to deal with the consequences of earlier judgment and decide what to do next.</p>
+    </div>
+    <div class="panel">
+      <h2>A Simple Example</h2>
+      <p>An instructor presents an initial patient scenario and asks the learner to choose the first action. After that choice, the instructor reveals that the patient’s condition has changed or that a new result has come back. The learner must then decide whether to continue, adjust, or abandon the original plan.</p>
+      <p>At the end, the learner explains two things: why the first decision made sense at the time, and why the second decision did or did not require a change in direction.</p>
+      <p>That explanation shows whether the learner can sustain reasoning across time rather than produce one isolated answer.</p>
+    </div>
+  </div>
+</section>
+
+<section class="rise-block alt">
+  <h2>What This Means for Faculty Practice</h2>
+  <p>Improving thinking does not require adding new lectures, readings, or cases. The change occurs in how existing material is used. A case that once asked for description can be rewritten to require a decision. A discussion prompt that asked for explanation can be revised to require a choice and a defense.</p>
+  <p>This keeps the content stable while changing what learners are required to do with it. The instructor’s role shifts from presenting information to shaping how learners act on that information during the task.</p>
+</section>
+
+<section class="rise-block">
+  <div class="rise-tabs">
+    <button class="tab-btn active" type="button" data-group="faculty" data-target="faculty-changes">Where Instruction Changes</button>
+    <button class="tab-btn" type="button" data-group="faculty" data-target="faculty-modify">How to Modify an Existing Assignment</button>
+    <button class="tab-btn" type="button" data-group="faculty" data-target="faculty-look">What Faculty Should Look For in Student Work</button>
+    <button class="tab-btn" type="button" data-group="faculty" data-target="faculty-manage">Managing the Change in Practice</button>
+    <button class="tab-btn" type="button" data-group="faculty" data-target="faculty-start">Starting Point</button>
+  </div>
+  <div class="tab-content active" data-group="faculty" id="faculty-changes">
+    <h2>Where Instruction Changes</h2>
+    <div class="grid-3">
+      <div class="mini-card"><h3>Case Use</h3><p>Instead of asking learners to walk through a case, the instructor places a decision point inside it. The learner must act at that point rather than continue describing the situation.</p></div>
+      <div class="mini-card"><h3>Timing of Information</h3><p>Information can be released in parts instead of all at once. This forces the learner to act before the full picture is available and adjust as new details appear.</p></div>
+      <div class="mini-card"><h3>Response Expectations</h3><p>The assignment specifies what the learner must produce. A complete response includes a selected action and a short explanation tied to the case. General summaries are no longer accepted as full answers.</p></div>
+    </div>
+  </div>
+  <div class="tab-content" data-group="faculty" id="faculty-modify">
+    <h2>How to Modify an Existing Assignment</h2>
+    <p>Most assignments can be revised without changing the topic or learning materials. The instructor edits the prompt, not the content.</p>
+    <p>A practical sequence:</p>
+    <ul>
+      <li>Identify where a decision could occur in the current case or question</li>
+      <li>Rewrite the prompt so the learner must choose one action</li>
+      <li>Add one competing option that could reasonably be selected</li>
+      <li>Require a short explanation that connects the decision to specific details</li>
+    </ul>
+    <p>These changes can be made in a single assignment without redesigning the entire course.</p>
+  </div>
+  <div class="tab-content" data-group="faculty" id="faculty-look">
+    <h2>What Faculty Should Look For in Student Work</h2>
+    <p>When tasks require decisions, evaluation shifts to what the learner does with the case. The instructor reviews how the learner uses information, not how much is included.</p>
+    <p>Focus on:</p>
+    <ul>
+      <li>Whether the selected action matches the details of the case</li>
+      <li>Whether the explanation refers to specific findings rather than general statements</li>
+      <li>Whether the learner distinguishes between options when more than one is plausible</li>
+    </ul>
+    <p>This allows feedback to target how the learner is thinking, not just whether the answer aligns with expectations.</p>
+  </div>
+  <div class="tab-content" data-group="faculty" id="faculty-manage">
+    <h2>Managing the Change in Practice</h2>
+    <p>These adjustments can be introduced gradually. Faculty do not need to redesign every assignment at once. A single revised task can show how students respond to the new structure.</p>
+    <p>It is also useful to compare responses before and after the change. In many cases, the amount of writing decreases while the clarity of the decision increases. This makes grading more direct because the point of evaluation is clear.</p>
+  </div>
+  <div class="tab-content" data-group="faculty" id="faculty-start">
+    <h2>Starting Point</h2>
+    <p>Begin with one assignment that already uses a case or scenario. Apply a small set of changes:</p>
+    <ul>
+      <li>Insert a clear decision point</li>
+      <li>Provide two or three reasonable options</li>
+      <li>Require a brief justification tied to the case</li>
+      <li>Review how clearly the learner connects the decision to the evidence</li>
+    </ul>
+    <p>After reviewing the results, the same approach can be applied to other parts of the course.</p>
+  </div>
+</section>
+
+</div>
+</main>
+</div>
+
+<script>
+document.getElementById('coverBegin').addEventListener('click', () => {
+  document.getElementById('cover').classList.add('hidden');
+});
+
+document.querySelectorAll('.accordion-header').forEach(header => {
+  header.addEventListener('click', () => {
+    header.parentElement.classList.toggle('open');
+  });
+});
+
+document.querySelectorAll('.reveal-btn').forEach(button => {
+  button.addEventListener('click', () => {
+    button.parentElement.classList.toggle('open');
+  });
+});
+
+function changeTab(event) {
+  const btn = event.currentTarget;
+  const group = btn.dataset.group;
+  const targetId = btn.dataset.target;
+  const block = btn.closest('.rise-block') || document;
+  block.querySelectorAll('.tab-btn[data-group="' + group + '"]').forEach(item => item.classList.remove('active'));
+  block.querySelectorAll('.tab-content[data-group="' + group + '"]').forEach(item => item.classList.remove('active'));
+  btn.classList.add('active');
+  const target = block.querySelector('#' + targetId);
+  if (target) target.classList.add('active');
+}
+
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.addEventListener('click', changeTab);
+});
+
+document.querySelectorAll('.choice-btn').forEach(button => {
+  button.addEventListener('click', () => {
+    const group = button.dataset.choiceGroup;
+    const targetId = button.dataset.choiceTarget;
+    const block = button.closest('.choice-block');
+    block.querySelectorAll('.choice-btn[data-choice-group="' + group + '"]').forEach(item => item.classList.remove('active'));
+    block.querySelectorAll('.choice-panel[data-choice-group="' + group + '"]').forEach(item => item.classList.remove('active'));
+    button.classList.add('active');
+    const target = block.querySelector('#' + targetId);
+    if (target) target.classList.add('active');
+  });
+});
+</script>
+</body>
+</html>
