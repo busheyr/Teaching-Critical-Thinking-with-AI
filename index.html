@@ -78,6 +78,11 @@ body { margin:0; height:100%; background:#ffffff; font-family: system-ui, -apple
 .quote-line { border-block:1px solid var(--line); padding:2.4rem 0; font-weight:700; color:#1b2d40; }
 .section-divider { text-align:center; background:#fff; border-top:.6rem solid var(--green); box-shadow:0 .4rem 1.6rem rgba(0,0,0,.04); }
 .section-divider h2 { margin-bottom:0; }
+.gated-group[hidden] { display:none; }
+.continue-wrap { width:100%; margin:3rem 0; }
+.continue-btn { width:100%; border:0; border-radius:.8rem; background:#006649; color:#fff; min-height:6.4rem; font-size:1.9rem; font-weight:800; cursor:pointer; display:flex; align-items:center; justify-content:center; box-shadow:0 .4rem 1.6rem rgba(0,102,73,.18); transition:background .2s ease, transform .2s ease; }
+.continue-btn:hover { background:#00563e; transform:translateY(-1px); }
+.continue-btn:focus-visible { outline:.3rem solid #7dbaff; outline-offset:.3rem; }
 @media (max-width:850px) {
   .rise-shell__header { align-items:flex-start; flex-direction:column; }
   .split, .grid-2, .grid-3, .grid-4, .choice-block, .comparison { grid-template-columns:1fr; }
@@ -162,6 +167,11 @@ body { margin:0; height:100%; background:#ffffff; font-family: system-ui, -apple
   </div>
 </section>
 
+<div class="continue-wrap">
+  <button class="continue-btn" type="button" data-reveal-target="clinical-thinking">Continue</button>
+</div>
+
+<div class="gated-group" id="clinical-thinking" hidden>
 <section class="rise-block tint">
   <h2>What Critical Thinking Looks Like in Clinical Work</h2>
   <p>Clinical work requires decisions that lead to action. A learner must decide what to do using the information available in that moment. That information is often incomplete, and it may point in more than one direction. The quality of thinking is judged by how the learner handles that uncertainty.</p>
@@ -211,6 +221,18 @@ body { margin:0; height:100%; background:#ffffff; font-family: system-ui, -apple
     </div>
   </div>
   <div class="callout">Clinical thinking is demonstrated when a learner makes a decision and supports it with clear reasoning tied to the case.</div>
+</section>
+</div>
+
+<div class="continue-wrap" hidden>
+  <button class="continue-btn" type="button" data-reveal-target="ai-influence">Continue</button>
+</div>
+
+<div class="gated-group" id="ai-influence" hidden>
+<section class="rise-block">
+  <h2>How AI Can Shape Student Thinking</h2>
+  <p>Tools that generate responses can assist with early stages of a task. They can organize large amounts of information, outline standard approaches, and model how ideas connect within a clinical context. When used deliberately, they can help learners see how a response might be structured.</p>
+  <p>These tools also change how learners begin a task. Instead of forming an initial position, a learner may start by reviewing a complete response. This shifts the role of the learner from generating reasoning to evaluating or selecting from what is already produced.</p>
 </section>
 
 <section class="rise-block tint">
@@ -281,7 +303,13 @@ body { margin:0; height:100%; background:#ffffff; font-family: system-ui, -apple
     <p>These changes force the learner to engage with the case rather than accept a generated response.</p>
   </div>
 </section>
+</div>
 
+<div class="continue-wrap" hidden>
+  <button class="continue-btn" type="button" data-reveal-target="design-ideas">Continue</button>
+</div>
+
+<div class="gated-group" id="design-ideas" hidden>
 <section class="rise-block section-divider">
   <h2>Design Implementation Ideas</h2>
 </section>
@@ -465,7 +493,13 @@ body { margin:0; height:100%; background:#ffffff; font-family: system-ui, -apple
     <p>That explanation is where the thinking becomes visible. The instructor can see whether the learner understood the tension in the case or simply chose the option that sounded safest on paper.</p>
   </div>
 </section>
+</div>
 
+<div class="continue-wrap" hidden>
+  <button class="continue-btn" type="button" data-reveal-target="sequential-decisions">Continue</button>
+</div>
+
+<div class="gated-group" id="sequential-decisions" hidden>
 <section class="rise-block">
   <h2>Sequential Decisions</h2>
   <p>Many clinical tasks are presented as if one answer completes the work. A learner reads a case, chooses an action, and stops. That structure hides an important part of clinical thinking because real decisions do not end the situation. One choice changes the conditions of the case, and the next choice must be made from there.</p>
@@ -562,7 +596,13 @@ body { margin:0; height:100%; background:#ffffff; font-family: system-ui, -apple
     </div>
   </div>
 </section>
+</div>
 
+<div class="continue-wrap" hidden>
+  <button class="continue-btn" type="button" data-reveal-target="faculty-practice">Continue</button>
+</div>
+
+<div class="gated-group" id="faculty-practice" hidden>
 <section class="rise-block alt">
   <h2>What This Means for Faculty Practice</h2>
   <p>Improving thinking does not require adding new lectures, readings, or cases. The change occurs in how existing material is used. A case that once asked for description can be rewritten to require a decision. A discussion prompt that asked for explanation can be revised to require a choice and a defense.</p>
@@ -625,6 +665,7 @@ body { margin:0; height:100%; background:#ffffff; font-family: system-ui, -apple
     <p>After reviewing the results, the same approach can be applied to other parts of the course.</p>
   </div>
 </section>
+</div>
 
 </div>
 </main>
@@ -673,6 +714,23 @@ document.querySelectorAll('.choice-btn').forEach(button => {
     button.classList.add('active');
     const target = block.querySelector('#' + targetId);
     if (target) target.classList.add('active');
+  });
+});
+
+document.querySelectorAll('.continue-btn').forEach(button => {
+  button.addEventListener('click', () => {
+    const target = document.getElementById(button.dataset.revealTarget);
+    if (!target) return;
+
+    target.hidden = false;
+    button.closest('.continue-wrap').hidden = true;
+
+    const nextContinue = target.nextElementSibling;
+    if (nextContinue && nextContinue.classList.contains('continue-wrap')) {
+      nextContinue.hidden = false;
+    }
+
+    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
   });
 });
 </script>
